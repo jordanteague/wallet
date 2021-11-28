@@ -130,12 +130,15 @@ class Home extends Component {
       console.log(e)
     }
 
+
+
   }
 
   render() {
     return (
       <Layout>
-        <Button onClick={this.testSend}>Test</Button>
+        <Button onClick={this.testSend}>Test Send</Button>
+        <Button onClick={this.testSignMessage}>Test Sign</Button>
       </Layout>
     );
   }
