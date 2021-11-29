@@ -25,7 +25,8 @@ class Home extends Component {
     super(props);
   }
 
-  getProviderOptions = () => {
+  componentDidMount = async() => {
+
     const providerOptions = {
       walletconnect: {
         package: WalletConnectProvider, // required
@@ -34,13 +35,9 @@ class Home extends Component {
         }
       }
     };
-    return providerOptions;
-  }
-
-  componentDidMount = async() => {
 
     const web3Modal = new Web3Modal({
-      providerOptions: this.getProviderOptions()
+      providerOptions
     });
 
     const provider = await web3Modal.connect();
@@ -109,30 +106,6 @@ class Home extends Component {
       this.setState({ web3, pendingRequest: false, result: null });
     }
   };
-
-  testSend = async() => {
-
-    const { web3 } = this.state;
-
-    let accounts = await web3.eth.getAccounts();
-    let address = accounts[0];
-    let recipient = "0x348E75571db50E4572871eaBC0Fa4ECF5f6DEe30";
-
-    if (!web3) {
-      return;
-    }
-
-    try {
-      this.toggleModal();
-      await web3.eth.sendTransaction({ from: address, to: recipient, value: 10000000 });
-      console.log("worked")
-    } catch(e) {
-      console.log(e)
-    }
-
-
-
-  }
 
   render() {
     return (
