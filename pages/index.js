@@ -5,15 +5,29 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { Box, Flex, Button, Input, Text, Spacer, VStack, HStack } from "@chakra-ui/react";
 import Layout from "../components/Layout";
 
-class App extends Component {
+export default function App() {
 
-  state = {
-    web3: null,
-    account: null,
-    network: null
-  }
+  const [web3, setWeb3] = useState(null);
+  const [account, setAccount] = useState(null);
+  const [chainId, setChainId] = useState(null);
 
-  async componentDidMount() {
+  useEffect(() => {
+    connect();
+
+    if (window.ethereum) {
+      setChainId(window.ethereum.networkVersion);
+
+      ethereum.on("accountsChanged", function (accounts) {
+        connect();
+        console.log("changed!");
+      });
+      window.ethereum.on("chainChanged", () => {
+        connect();
+      });
+    }
+  }, []);
+
+  const connect = async() => {
 
     const providerOptions = {
       walletconnect: {
@@ -37,11 +51,14 @@ class App extends Component {
 
     let chainId = await web3.eth.getChainId();
 
-    this.setState({ web3, account, chainId });
+    setWeb3(web3);
+    console.log(web3)
+    setAccount(account);
+    setChainId(chainId);
 
   }
 
-  send = async(e) => {
+  const send = async(e) => {
 
     e.preventDefault();
     let object = event.target;
@@ -52,18 +69,16 @@ class App extends Component {
 
     var { recipient, amount } = array;
 
-    const { web3, account, chainId } = this.state;
-
     await web3.eth.sendTransaction({from: account, to: array['to'], value: array['amount']});
   }
 
-  render() {
+
 
     return (
       <Layout>
-        <Button>{this.state.account!=null ? this.state.account : <>Connect Wallet</>}</Button>
-        {this.state.chainId!=null ? <Button>chain: {this.state.chainId}</Button> : ''}
-        <form onSubmit={this.send}>
+        <Button>{account!=null ? account : <>Connect Wallet</>}</Button>
+        {chainId!=null ? <Button>chain: {chainId}</Button> : ''}
+        <form onSubmit={send}>
           <Text>To</Text><Input name="to" />
           <Text>Amount</Text><Input name="amount" />
           <Button type="submit">Send</Button>
@@ -72,7 +87,5 @@ class App extends Component {
 
       </Layout>
     );
-}
-}
 
-export default App;
+}
