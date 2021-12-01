@@ -8,7 +8,9 @@ import Layout from "../components/Layout";
 class App extends Component {
 
   state = {
-    web3: null
+    web3: null,
+    account: null,
+    network: null
   }
 
   async componentDidMount() {
@@ -17,7 +19,7 @@ class App extends Component {
       walletconnect: {
         package: WalletConnectProvider, // required
         options: {
-          infuraId: "26e178ea568e492983f2431ad6a31e74" // required
+          infuraId: "f0d8e56e0aeb4a8594192dc550f05a2d" // required
         }
       }
     };
@@ -30,16 +32,19 @@ class App extends Component {
 
     const web3 = new Web3(provider);
 
-    this.setState({ web3 });
+    let accounts = await web3.eth.getAccounts();
+    let account = accounts[0];
+
+    let chainId = await web3.eth.getChainId();
+
+    this.setState({ web3, account, chainId });
 
   }
 
   send = async() => {
 
-    const { web3 } = this.state;
+    const { web3, account, chainId } = this.state;
 
-    let accounts = await web3.eth.getAccounts();
-    let account = accounts[0];
     await web3.eth.sendTransaction({from: account, to: '0x348E75571db50E4572871eaBC0Fa4ECF5f6DEe30', value: 100});
   }
 
@@ -47,7 +52,8 @@ class App extends Component {
 
     return (
       <Layout>
-        <>Connected:</>
+        <Text>account: {this.state.account}</Text>
+        <Text>chain: {this.state.chainId}</Text>
 
         <Button onClick={this.send}>Test Sign</Button>
       </Layout>
